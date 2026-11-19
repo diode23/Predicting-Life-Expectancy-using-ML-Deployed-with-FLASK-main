@@ -1,0 +1,598 @@
+<!DOCTYPE html>
+<html lang="es">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <meta name="color-scheme" content="dark light">
+
+    <title>Predicción de esperanza de vida</title>
+
+    <style>
+        :root {
+            color-scheme: dark;
+
+            --fondo: #0f172a;
+            --fondo-secundario: #111827;
+            --tarjeta: #1e293b;
+            --campo: #0f172a;
+            --borde: #334155;
+            --texto: #e5e7eb;
+            --texto-secundario: #94a3b8;
+            --primario: #38bdf8;
+            --primario-hover: #0ea5e9;
+            --encabezado-tabla: #075985;
+            --fila-alternativa: #172033;
+            --sombra: rgba(0, 0, 0, 0.35);
+        }
+
+        body.light-mode {
+            color-scheme: light;
+
+            --fondo: #f1f5f9;
+            --fondo-secundario: #ffffff;
+            --tarjeta: #ffffff;
+            --campo: #f8fafc;
+            --borde: #cbd5e1;
+            --texto: #1e293b;
+            --texto-secundario: #475569;
+            --primario: #0284c7;
+            --primario-hover: #0369a1;
+            --encabezado-tabla: #0369a1;
+            --fila-alternativa: #f1f5f9;
+            --sombra: rgba(15, 23, 42, 0.15);
+        }
+
+        * {
+            box-sizing: border-box;
+        }
+
+        html {
+            scroll-behavior: smooth;
+        }
+
+        body {
+            background:
+                radial-gradient(
+                    circle at top left,
+                    rgba(14, 165, 233, 0.12),
+                    transparent 35%
+                ),
+                var(--fondo);
+
+            font-family: Arial, Helvetica, sans-serif;
+            font-size: 16px;
+            line-height: 1.5;
+            color: var(--texto);
+            margin: 0;
+            padding: 0 20px 50px;
+            transition: background-color 0.3s ease, color 0.3s ease;
+        }
+
+        .barra-superior {
+            max-width: 1100px;
+            margin: 20px auto 0;
+            display: flex;
+            justify-content: flex-end;
+        }
+
+        .boton-tema {
+            background-color: var(--tarjeta);
+            color: var(--texto);
+            border: 1px solid var(--borde);
+            border-radius: 8px;
+            padding: 10px 15px;
+            cursor: pointer;
+            font-size: 14px;
+            transition: all 0.3s ease;
+        }
+
+        .boton-tema:hover {
+            background-color: var(--primario);
+            color: #ffffff;
+            border-color: var(--primario);
+        }
+
+        h1 {
+            margin: 35px auto 0;
+            text-align: center;
+            font-size: 42px;
+            color: var(--primario);
+        }
+
+        h2 {
+            text-align: center;
+            margin-top: 55px;
+            color: var(--primario);
+        }
+
+        .subtitulo {
+            max-width: 850px;
+            margin: 10px auto;
+            text-align: center;
+            color: var(--texto-secundario);
+        }
+
+        form {
+            background-color: var(--tarjeta);
+            border: 1px solid var(--borde);
+            border-radius: 14px;
+            box-shadow: 0 10px 30px var(--sombra);
+            margin: 40px auto 0;
+            padding: 30px 25px;
+            display: flex;
+            flex-direction: column;
+            align-items: center;
+            max-width: 550px;
+        }
+
+        label {
+            font-size: 17px;
+            font-weight: bold;
+            color: var(--texto);
+            margin-bottom: 8px;
+        }
+
+        input[type="number"] {
+            padding: 11px;
+            border-radius: 7px;
+            border: 1px solid var(--borde);
+            margin-bottom: 22px;
+            width: 320px;
+            font-size: 16px;
+            color: var(--texto);
+            background-color: var(--campo);
+            box-shadow: 0 2px 5px var(--sombra);
+            transition: all 0.3s ease;
+        }
+
+        input[type="number"]:focus {
+            outline: none;
+            border-color: var(--primario);
+            box-shadow: 0 0 0 3px rgba(56, 189, 248, 0.2);
+        }
+
+        input[type="submit"] {
+            background-color: var(--primario);
+            color: #ffffff;
+            padding: 13px;
+            border: none;
+            border-radius: 7px;
+            font-size: 16px;
+            font-weight: bold;
+            cursor: pointer;
+            box-shadow: 0 3px 8px var(--sombra);
+            transition: all 0.3s ease;
+            margin-top: 15px;
+            width: 320px;
+        }
+
+        input[type="submit"]:hover {
+            background-color: var(--primario-hover);
+            transform: translateY(-1px);
+        }
+
+        .resultado {
+            max-width: 700px;
+            margin: 35px auto;
+            padding: 18px;
+            border: 1px solid var(--primario);
+            border-radius: 10px;
+            background-color: var(--tarjeta);
+            color: var(--primario);
+            font-size: 24px;
+            font-weight: bold;
+            text-align: center;
+            box-shadow: 0 5px 18px var(--sombra);
+        }
+
+        .nota {
+            max-width: 850px;
+            margin: 15px auto 25px;
+            text-align: center;
+            color: var(--texto-secundario);
+        }
+
+        .tabla-contenedor {
+            max-width: 1150px;
+            margin: 20px auto;
+            overflow-x: auto;
+            border-radius: 10px;
+            box-shadow: 0 8px 25px var(--sombra);
+        }
+
+        table {
+            width: 100%;
+            min-width: 1500px;
+            border-collapse: collapse;
+            background-color: var(--tarjeta);
+        }
+
+        th,
+        td {
+            padding: 12px 10px;
+            border: 1px solid var(--borde);
+            text-align: center;
+        }
+
+        th {
+            background-color: var(--encabezado-tabla);
+            color: #ffffff;
+            font-size: 14px;
+        }
+
+        td {
+            color: var(--texto);
+            font-size: 14px;
+        }
+
+        tr:nth-child(even) {
+            background-color: var(--fila-alternativa);
+        }
+
+        tr:hover {
+            background-color: rgba(56, 189, 248, 0.12);
+        }
+
+        .tooltip {
+            position: relative;
+            display: inline-block;
+            border-bottom: 1px dotted var(--texto-secundario);
+            margin-bottom: 4px;
+        }
+
+        .tooltip .tooltiptext {
+            visibility: hidden;
+            width: 285px;
+            background-color: #020617;
+            color: #f8fafc;
+            text-align: center;
+            border-radius: 7px;
+            padding: 9px;
+            position: absolute;
+            z-index: 2;
+            bottom: 125%;
+            left: 50%;
+            transform: translateX(-50%);
+            opacity: 0;
+            transition: opacity 0.3s ease;
+            font-size: 13px;
+            font-weight: normal;
+            box-shadow: 0 4px 12px rgba(0, 0, 0, 0.4);
+        }
+
+        .tooltip:hover .tooltiptext {
+            visibility: visible;
+            opacity: 1;
+        }
+
+        @media (max-width: 600px) {
+            h1 {
+                font-size: 32px;
+            }
+
+            form {
+                padding: 25px 15px;
+            }
+
+            input[type="number"],
+            input[type="submit"] {
+                width: 90%;
+            }
+
+            .resultado {
+                font-size: 20px;
+            }
+
+            th,
+            td {
+                font-size: 12px;
+                padding: 8px 5px;
+            }
+        }
+    </style>
+</head>
+
+<body>
+    <div class="barra-superior">
+        <button class="boton-tema" id="botonTema" type="button">
+            ☀️ Cambiar a modo claro
+        </button>
+    </div>
+
+    <h1>Predicción de esperanza de vida</h1>
+
+    <p class="subtitulo">
+        Introduce los indicadores sanitarios, económicos y sociales para obtener
+        una predicción mediante el modelo de regresión lineal.
+    </p>
+
+    <form action="{{ url_for('predict') }}" method="post">
+
+        <div class="tooltip">
+            <label for="Adult Mortality">Mortalidad adulta:</label>
+            <span class="tooltiptext">
+                Muertes entre los 15 y 60 años por cada 1.000 habitantes.
+            </span>
+        </div>
+        <input type="number" id="Adult Mortality"
+               name="Adult Mortality"
+               min="0" max="1000" step="0.1" required>
+
+        <div class="tooltip">
+            <label for="Alcohol">Consumo de alcohol:</label>
+            <span class="tooltiptext">
+                Consumo por persona mayor de 15 años, medido en litros de alcohol puro.
+            </span>
+        </div>
+        <input type="number" id="Alcohol"
+               name="Alcohol"
+               min="0" max="50" step="0.1" required>
+
+        <div class="tooltip">
+            <label for="Percentage Expenditure">
+                Porcentaje del gasto sanitario:
+            </label>
+            <span class="tooltiptext">
+                Gasto en salud como porcentaje del PIB per cápita.
+            </span>
+        </div>
+        <input type="number" id="Percentage Expenditure"
+               name="Percentage Expenditure"
+               min="0" step="0.1" required>
+
+        <div class="tooltip">
+            <label for="Hepatitis B">Cobertura de hepatitis B:</label>
+            <span class="tooltiptext">
+                Porcentaje de niños de un año vacunados contra la hepatitis B.
+            </span>
+        </div>
+        <input type="number" id="Hepatitis B"
+               name="Hepatitis B"
+               min="0" max="100" step="0.1" required>
+
+        <div class="tooltip">
+            <label for="Measles">Casos de sarampión:</label>
+            <span class="tooltiptext">
+                Casos reportados de sarampión por cada 1.000 habitantes.
+            </span>
+        </div>
+        <input type="number" id="Measles"
+               name="Measles"
+               min="0" max="1000" step="0.1" required>
+
+        <div class="tooltip">
+            <label for="BMI">Índice de masa corporal:</label>
+            <span class="tooltiptext">
+                Índice de masa corporal promedio de la población.
+            </span>
+        </div>
+        <input type="number" id="BMI"
+               name="BMI"
+               min="0" step="0.1" required>
+
+        <div class="tooltip">
+            <label for="Polio">Cobertura de poliomielitis:</label>
+            <span class="tooltiptext">
+                Porcentaje de niños de un año vacunados contra la poliomielitis.
+            </span>
+        </div>
+        <input type="number" id="Polio"
+               name="Polio"
+               min="0" max="100" step="0.1" required>
+
+        <div class="tooltip">
+            <label for="Total expenditure">
+                Gasto sanitario total:
+            </label>
+            <span class="tooltiptext">
+                Gasto en salud como porcentaje del gasto total del Gobierno.
+            </span>
+        </div>
+        <input type="number" id="Total expenditure"
+               name="Total expenditure"
+               min="0" max="100" step="0.1" required>
+
+        <div class="tooltip">
+            <label for="Diphtheria">Cobertura de difteria:</label>
+            <span class="tooltiptext">
+                Porcentaje de niños de un año vacunados con DTP3.
+            </span>
+        </div>
+        <input type="number" id="Diphtheria"
+               name="Diphtheria"
+               min="0" max="100" step="0.1" required>
+
+        <div class="tooltip">
+            <label for="HIV/AIDS">VIH/SIDA:</label>
+            <span class="tooltiptext">
+                Muertes asociadas al VIH/SIDA por cada 1.000 nacidos vivos.
+            </span>
+        </div>
+        <input type="number" id="HIV/AIDS"
+               name="HIV/AIDS"
+               min="0" max="1000" step="0.1" required>
+
+        <div class="tooltip">
+            <label for="GDP">PIB per cápita:</label>
+            <span class="tooltiptext">
+                Producto interno bruto per cápita, expresado en dólares estadounidenses.
+            </span>
+        </div>
+        <input type="number" id="GDP"
+               name="GDP"
+               min="0" step="0.1" required>
+
+        <div class="tooltip">
+            <label for="Population">Población:</label>
+            <span class="tooltiptext">
+                Población total del país o región.
+            </span>
+        </div>
+        <input type="number" id="Population"
+               name="Population"
+               min="500" step="1" required>
+
+        <div class="tooltip">
+            <label for="Income composition of resources">
+                Composición de ingresos:
+            </label>
+            <span class="tooltiptext">
+                Índice de composición de los recursos, entre 0 y 1.
+            </span>
+        </div>
+        <input type="number" id="Income composition of resources"
+               name="Income composition of resources"
+               min="0" max="1" step="0.01" required>
+
+        <div class="tooltip">
+            <label for="Schooling">Años de escolaridad:</label>
+            <span class="tooltiptext">
+                Número promedio de años de escolaridad.
+            </span>
+        </div>
+        <input type="number" id="Schooling"
+               name="Schooling"
+               min="0" max="30" step="0.1" required>
+
+        <input type="submit" value="Predecir esperanza de vida">
+    </form>
+
+    {% if prediction %}
+        <p class="resultado">
+            Esperanza de vida predicha: {{ prediction }} años
+        </p>
+    {% endif %}
+
+    <h2>Ejemplos de valores para probar</h2>
+
+    <p class="nota">
+        Estos valores sirven como ejemplos de prueba. El modelo no realiza
+        una predicción clínica individual ni representa necesariamente datos
+        oficiales específicos de Caracas.
+    </p>
+
+    <div class="tabla-contenedor">
+        <table>
+            <thead>
+                <tr>
+                    <th>Escenario</th>
+                    <th>Mortalidad adulta</th>
+                    <th>Alcohol</th>
+                    <th>Gasto sanitario (%)</th>
+                    <th>Hepatitis B (%)</th>
+                    <th>Sarampión</th>
+                    <th>BMI</th>
+                    <th>Polio (%)</th>
+                    <th>Gasto total (%)</th>
+                    <th>Difteria (%)</th>
+                    <th>VIH/SIDA</th>
+                    <th>PIB per cápita</th>
+                    <th>Población</th>
+                    <th>Composición ingresos</th>
+                    <th>Escolaridad</th>
+                </tr>
+            </thead>
+
+            <tbody>
+                <tr>
+                    <td>Caracas: escenario bajo</td>
+                    <td>180</td>
+                    <td>4.0</td>
+                    <td>5.0</td>
+                    <td>85</td>
+                    <td>50</td>
+                    <td>25.0</td>
+                    <td>85</td>
+                    <td>5.5</td>
+                    <td>85</td>
+                    <td>0.5</td>
+                    <td>5000</td>
+                    <td>3000000</td>
+                    <td>0.60</td>
+                    <td>10</td>
+                </tr>
+
+                <tr>
+                    <td>Caracas: escenario medio</td>
+                    <td>140</td>
+                    <td>5.0</td>
+                    <td>6.0</td>
+                    <td>90</td>
+                    <td>20</td>
+                    <td>26.0</td>
+                    <td>90</td>
+                    <td>6.0</td>
+                    <td>90</td>
+                    <td>0.3</td>
+                    <td>10000</td>
+                    <td>3000000</td>
+                    <td>0.70</td>
+                    <td>12</td>
+                </tr>
+
+                <tr>
+                    <td>Caracas: escenario favorable</td>
+                    <td>100</td>
+                    <td>6.0</td>
+                    <td>8.0</td>
+                    <td>95</td>
+                    <td>5</td>
+                    <td>27.0</td>
+                    <td>95</td>
+                    <td>7.0</td>
+                    <td>95</td>
+                    <td>0.1</td>
+                    <td>20000</td>
+                    <td>3000000</td>
+                    <td>0.80</td>
+                    <td>14</td>
+                </tr>
+
+                <tr>
+                    <td>Referencia del README</td>
+                    <td>120</td>
+                    <td>5.0</td>
+                    <td>7.0</td>
+                    <td>90</td>
+                    <td>10</td>
+                    <td>25.0</td>
+                    <td>90</td>
+                    <td>6.0</td>
+                    <td>90</td>
+                    <td>0.2</td>
+                    <td>50000</td>
+                    <td>1000000</td>
+                    <td>0.75</td>
+                    <td>12</td>
+                </tr>
+            </tbody>
+        </table>
+    </div>
+
+    <script>
+        const botonTema = document.getElementById("botonTema");
+        const body = document.body;
+
+        const temaGuardado = localStorage.getItem("tema");
+
+        if (temaGuardado === "claro") {
+            body.classList.add("light-mode");
+            botonTema.textContent = "🌙 Cambiar a modo oscuro";
+        }
+
+        botonTema.addEventListener("click", function () {
+            body.classList.toggle("light-mode");
+
+            const modoClaroActivo = body.classList.contains("light-mode");
+
+            if (modoClaroActivo) {
+                botonTema.textContent = "🌙 Cambiar a modo oscuro";
+                localStorage.setItem("tema", "claro");
+            } else {
+                botonTema.textContent = "☀️ Cambiar a modo claro";
+                localStorage.setItem("tema", "oscuro");
+            }
+        });
+    </script>
+</body>
+</html>
