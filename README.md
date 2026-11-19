@@ -1,16 +1,12 @@
 # 🌍 Predicción de la Esperanza de Vida con Machine Learning y Flask
 
-<div align="center">
-
-
-
-
-
-
-
-
-
-</div>
+![Python](https://img.shields.io/badge/Python-3.8%2B-blue?logo=python&logoColor=white)
+![Flask](https://img.shields.io/badge/Flask-2.x-black?logo=flask&logoColor=white)
+![scikit-learn](https://img.shields.io/badge/scikit--learn-1.x-orange?logo=scikitlearn&logoColor=white)
+![Pandas](https://img.shields.io/badge/Pandas-2.x-150458?logo=pandas&logoColor=white)
+![NumPy](https://img.shields.io/badge/NumPy-1.x-013243?logo=numpy&logoColor=white)
+![Machine Learning](https://img.shields.io/badge/Machine%20Learning-Regresi%C3%B3n%20Lineal-green)
+![License](https://img.shields.io/badge/Licencia-MIT-yellow)
 
 ## 🚀 Descripción del proyecto
 
@@ -29,23 +25,12 @@ La aplicación está desarrollada con **Flask**, lo que permite al usuario ingre
 - 🖥️ Interfaz sencilla y fácil de usar.
 - 📈 Ideal para aprender sobre Machine Learning, Flask y despliegue de modelos.
 
-## 🛠️ Tecnologías utilizadas
-
-| Tecnología | Uso en el proyecto |
-|---|---|
-| 🐍 Python | Lenguaje principal del proyecto |
-| 🌶️ Flask | Desarrollo de la aplicación web |
-| 🤖 scikit-learn | Entrenamiento del modelo de Machine Learning |
-| 📊 Pandas | Manipulación y análisis de datos |
-| 📈 NumPy | Cálculos numéricos |
-| 🌍 Datos de la OMS | Entrenamiento del modelo |
-
 ## 📦 Instalación
 
 Clona este repositorio en tu computadora:
 
 ```bash
-git clone https://github.com/tu-usuario/tu-repositorio.git
+git clone [https://github.com/tu-usuario/tu-repositorio.git](https://github.com/tu-usuario/tu-repositorio.git)
 cd tu-repositorio
 ```
 
@@ -114,7 +99,7 @@ El conjunto de datos incluye información relacionada con:
 
 La aplicación permite visualizar el resultado de la predicción de la esperanza de vida según los datos ingresados por el usuario.
 
-
+![Captura de la aplicación](https://raw.githubusercontent.com/Kalyanspunk/Predicting-Life-Expectancy-using-ML-Deployed-with-FLASK/main/ml%20model%20using%20flask/screenshots/predicted.png)
 
 ## 🔮 Trabajo futuro
 
@@ -140,12 +125,6 @@ Si encuentras un error, tienes una idea de mejora o deseas agregar nuevas funcio
 ## 📄 Licencia
 
 Este proyecto está disponible bajo la licencia que definas en tu repositorio.
-
-Puedes utilizar una licencia como:
-
-- MIT
-- Apache 2.0
-- GPL
 
 ## 👤 Autor
 
